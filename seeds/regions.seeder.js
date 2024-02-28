@@ -1,0 +1,26 @@
+const regions = [
+  { id: 1, name: 'Haa Alif Atoll', shortName: 'HA', referenceNo: 1 },
+  { id: 2, name: 'Haa Dhaalu Atoll', shortName: 'HDh', referenceNo: 2 },
+  { id: 3, name: 'Shaviyani Atoll', shortName: 'Sh', referenceNo: 3 },
+  { id: 4, name: 'Noonu Atoll', shortName: 'N', referenceNo: 4 },
+  { id: 5, name: 'Raa Atoll', shortName: 'R', referenceNo: 5 },
+  { id: 6, name: 'Baa Atoll', shortName: 'B', referenceNo: 6 },
+  { id: 7, name: 'Lhaviyani Atoll', shortName: 'Lh', referenceNo: 7 },
+  { id: 8, name: 'Kaafu Atoll', shortName: 'K', referenceNo: 8 },
+  { id: 9, name: 'Male City', shortName: 'MLE', referenceNo: null },
+  { id: 10, name: 'Alif Alif Atoll', shortName: 'AA', referenceNo: null }, 
+  { id: 11, name: 'Alif Dhaal Atoll', shortName: 'ADh', referenceNo: null }, 
+  { id: 12, name: 'Vaavu Atoll', shortName: 'V', referenceNo: null }, 
+  { id: 13, name: 'Meemu Atoll', shortName: 'M', referenceNo: 9 }, 
+  { id: 14, name: 'Faafu Atoll', shortName: 'F', referenceNo: 10 }, 
+  { id: 15, name: 'Dhaalu Atoll', shortName: 'Dh', referenceNo: null }, 
+  { id: 16, name: 'Thaa Atoll', shortName: 'Th', referenceNo: 11 }, 
+  { id: 17, name: 'Laamu Atoll', shortName: 'L', referenceNo: 13 }, 
+  { id: 18, name: 'Gaafu Alif Atoll', shortName: 'GA', referenceNo: 14 }, 
+  { id: 19, name: 'Gaafu Dhaalu Atoll', shortName: 'GDh', referenceNo: 15 }, 
+  { id: 20, name: 'Gnaviyani Atoll', shortName: 'Gn', referenceNo: 16 }, 
+  { id: 21, name: 'Addu City', shortName: 'S', referenceNo: 17 }, 
+  { id: 22, name: 'Kulhudhuffushi City', shortName: 'KD', referenceNo: null },
+]
+
+module.exports = regions
