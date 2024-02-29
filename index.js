@@ -2,8 +2,12 @@ const { getRandomInt, writeFile } = require('./helpers')
 const regions = require('./seeds/regions.seeder')
 const branches = require('./seeds/branch.seeder')
 
+const startDate = new Date('2024-01-01')
+const stopDate = new Date('2024-03-01')
+
 let generatorId = 0;
 let statusLogId = 0;
+let dailyLogId = 0;
 
 const brands = [
   "VOLVO",
@@ -25,9 +29,12 @@ regions.forEach(region => {
 
   branches.forEach(branch => {
     if(branch.regionId == region.id){
-      const branchGenerators = genGenerator(branch.id);
+      const { branchGenerators, branchAvailableCapacity } = genGenerator(branch.id)
+      const branchDailyLogs = dailyLogGenerator(branchAvailableCapacity)
 
-      branch.generators = branchGenerators;
+      branch.dailyLogs = branchDailyLogs
+      branch.generators = branchGenerators
+
       regionBranches.push(branch);
     }
   });
@@ -45,12 +52,14 @@ function genGenerator(branchId) {
   const maxGenerators = 8
   const generatorAmount = getRandomInt(minGenerators, maxGenerators)
 
+  let branchAvailableCapacity = 0;
+
   for(let i = 0; i < generatorAmount; i++){
     generatorId++;
     const models = generateModels()
     const installCapacity = getRandomInt(2, 9) * 100
     const availableCapacity = installCapacity - (getRandomInt(2, 9) * 10)
-    const statusLogs = statusLogGenerator();
+    branchAvailableCapacity += availableCapacity;
 
     branchGenerators.push({
       id: generatorId,
@@ -61,17 +70,19 @@ function genGenerator(branchId) {
       serialNumber: new Date().valueOf() + (generatorId * 834784) + '',
       installCapacity,
       availableCapacity,
-      statusLogs,
     })
   }
 
-  return branchGenerators;
+  branchGenerators.forEach(branchGenerator => {
+    const statusLogs = statusLogGenerator();
+    branchGenerator.statusLogs = statusLogs;
+  });
+
+  return { branchGenerators, branchAvailableCapacity };
 }
 
 function statusLogGenerator() {
   const statusLogs = []
-  const startDate = new Date('2024-01-01')
-  const stopDate = new Date('2024-03-01')
 
   statusLogId++;
 
@@ -132,4 +143,32 @@ function statusDataGenerator(statusData) {
   }
 
   return newStatusData
+}
+
+function dailyLogGenerator(branchAvailableCapacity) {
+  const dailyLogs = []
+
+  for(
+    let date = startDate;
+    date < stopDate;
+    date = new Date(date.getTime() + (1000 * 60 * 60 * 24))
+  ) {
+    dailyLogId++;
+
+    dailyLogs.push({
+      id: dailyLogId,
+      date,
+      load: getRandomInt(1, branchAvailableCapacity),
+    })
+  }
+
+  // dailyLogId++;
+
+  // dailyLogs.push({
+  //   id: dailyLogId,
+  //   date: startDate,
+  //   load: 500,
+  // })
+
+  return dailyLogs
 }
