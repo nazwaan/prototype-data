@@ -35,8 +35,6 @@ regions.forEach(region => {
   region.branches = regionBranches;
 })
 
-console.log(regions[0].branches[0].generators[0]);
-
 writeFile(regions);
 
 // functions
@@ -72,43 +70,66 @@ function genGenerator(branchId) {
 
 function statusLogGenerator() {
   const statusLogs = []
-  const minStatusLogs = 1
-  const maxStatusLogs = 6
-  const generatorAmount = getRandomInt(minStatusLogs, maxStatusLogs)
+  const startDate = new Date('2024-01-01')
+  const stopDate = new Date('2024-03-01')
 
-  let date = new Date('2024-01-01')
-  let type = 'running'
-  let status = 'healthy'
+  statusLogId++;
 
-  for(let i = 0; i < generatorAmount; i++){
-    statusLogId++
-    date = new Date(date.getTime() + (1000 * 60 * 60 * getRandomInt(1, 5)))
+  let statusData = {
+    id: statusLogId,
+    generatorId,
+    date: startDate,
+    status: 'running',
+    description: 'healthy',
+  }
 
-    statusLogs.push({
-      id: statusLogId,
-      generatorId,
-      date,
-      type,
-      status,
-    })
+  statusLogs.push(statusData);
 
-    if(type == 'running') {
-      type = 'stopped'
-      status = 'generator malfunction'
-    }
-    else if(type == 'stopped' && status != 'stopped for maintenance') {
-      type = 'running with issues'
-      status = 'cracked parts'
-    }
-    else if(type == 'running with issues') {
-      type = 'stopped'
-      status = 'stopped for maintenance'
-    }
-    else if(type == 'stopped') {
-      type = 'running'
-      status = 'healthy'
+  for(
+    let date = new Date(startDate.getTime() + (1000 * 60 * 30));
+    date < stopDate;
+    date = new Date(date.getTime() + (1000 * 60 * 30))
+  ) {
+    const makeLogChance = getRandomInt(1, 500);
+    if(makeLogChance <= 1) {
+      statusLogId++
+      statusData.date = date
+      statusData = statusDataGenerator(statusData)
+
+      statusLogs.push(statusData)
     }
   }
 
   return statusLogs
+}
+
+function statusDataGenerator(statusData) {
+  let { status, description } = statusData
+
+  if(status == 'running') {
+    status = 'stopped'
+    description = 'generator malfunction'
+  }
+  else if(status == 'stopped' && description != 'stopped for maintenance') {
+    status = 'running with issues'
+    description = 'cracked parts'
+  }
+  else if(status == 'running with issues') {
+    status = 'stopped'
+    description = 'stopped for maintenance'
+  }
+  else if(status == 'stopped') {
+    status = 'running'
+    description = 'healthy'
+  }
+
+  const newStatusData = {
+    id: statusLogId,
+    generatorId,
+    date: statusData.date,
+    status,
+    description,
+  }
+
+  return newStatusData
 }
