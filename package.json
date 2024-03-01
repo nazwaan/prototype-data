@@ -1,0 +1,12 @@
+{
+  "name": "prototype-data",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:nazwaan/prototype-data.git",
+  "author": "nazwaan <ismail.nazwan72@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "generate-data": "node ./generator/index.js",
+    "dev": "node index.js"
+  }
+}
