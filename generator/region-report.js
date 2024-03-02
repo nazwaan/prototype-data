@@ -40,7 +40,7 @@ regions.forEach(region => {
   region.branches = regionBranches;
 })
 
-writeFile(regions);
+writeFile(regions, './report.json');
 
 // functions
 

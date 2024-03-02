@@ -9,7 +9,7 @@ const lt = new Date('2024-02-29')
 // console.dir(branchLoads)
 
 // get branch generators status logs with in a time range and according to filters
-// const timeRange = { gte, lt }
-// const filter = { status: 'issues' }
-// const branchStatus = branchExtractor.getBranchStatus(1, timeRange, filter)
-// console.dir(branchStatus)
+const timeRange = { gte, lt }
+const filter = { status: 'issues' }
+const branchStatus = branchExtractor.getBranchStatus(1, timeRange, filter)
+console.dir(branchStatus)
