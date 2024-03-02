@@ -50,8 +50,6 @@ function genGenerator(branchId) {
   const maxGenerators = 8
   const generatorAmount = getRandomInt(minGenerators, maxGenerators)
 
-  let branchAvailableCapacity = 0;
-
   for(let i = 0; i < generatorAmount; i++){
     generatorId++;
     const models = generateModels()
@@ -91,8 +89,9 @@ function statusLogGenerator() {
     id: statusLogId,
     generatorId,
     date: startDate,
-    status: 'running',
-    description: 'healthy',
+    state: 'running',
+    status: 'healthy',
+    description: 'routine check and found healthy',
   }
 
   statusLogs.push(statusData);
@@ -116,29 +115,34 @@ function statusLogGenerator() {
 }
 
 function statusDataGenerator(statusData) {
-  let { status, description } = statusData
+  let { state, status, description } = statusData
 
-  if(status == 'running') {
-    status = 'stopped'
+  if(state == 'running' && status == 'healthy') {
+    state = 'stopped'
+    status = 'issues'
     description = 'generator malfunction'
   }
-  else if(status == 'stopped' && description != 'stopped for maintenance') {
-    status = 'running with issues'
+  else if(state == 'stopped' && description != 'stopped for maintenance') {
+    state = 'running'
+    status = 'issues'
     description = 'cracked parts'
   }
-  else if(status == 'running with issues') {
-    status = 'stopped'
+  else if(state == 'running' && status == 'issues') {
+    state = 'stopped'
+    status = 'issues'
     description = 'stopped for maintenance'
   }
-  else if(status == 'stopped') {
-    status = 'running'
-    description = 'healthy'
+  else if(state == 'stopped') {
+    state = 'running'
+    status = 'healthy'
+    description = 'maintenance service done and healthy'
   }
 
   const newStatusData = {
     id: statusLogId,
     generatorId,
     date: statusData.date,
+    state,
     status,
     description,
   }
