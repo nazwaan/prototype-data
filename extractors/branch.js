@@ -1,16 +1,32 @@
 const GeneratorExtractor = require('./generator')
+const report = require('../report.json')
 
 class BranchExtractor {
   constructor() {
     this.branch = null
   }
 
-  getBranchLoad(branch, gte, lt) {
+  getBranch(branchId) {
+    let branch = null
+
+    report.forEach(region => {
+      const searchBranch = region.branches.find(branch => branch.id == branchId)
+      if(searchBranch){ branch = searchBranch }
+    })
+
+    return branch;
+  }
+
+  getBranchLoad(branchId, gte, lt) {
+    const branch = this.getBranch(branchId)
     const generatorExtractor = new GeneratorExtractor();
+    const branchGenerators = []
     const loads = []
 
     branch.generators.forEach(generator => {
-      const { minLoad, maxLoad } = generatorExtractor.getGeneratorLoad(generator, gte, lt)
+      const generatorLoads = generatorExtractor.getGeneratorLoad(generator, gte, lt)
+      const { minLoad, maxLoad } = generatorLoads
+      branchGenerators.push(generatorLoads)
       loads.push(minLoad, maxLoad)
     })
 
@@ -19,10 +35,19 @@ class BranchExtractor {
     const minLoad = loads[0]
     const maxLoad = loads[loads.length - 1]
 
-    return { minLoad, maxLoad }
+    const branchLoads = {
+      id: branch.id,
+      name: branch.name,
+      minLoad,
+      maxLoad,
+      generators: branchGenerators,
+    }
+
+    return branchLoads
   }
 
-  getBranchStatus(branch, dateRange, filter) {
+  getBranchStatus(branchId, dateRange, filter) {
+    const branch = this.getBranch(branchId)
     const generatorExtractor = new GeneratorExtractor();
     const branchStatusLogs = []
 

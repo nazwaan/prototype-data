@@ -11,7 +11,20 @@ class GeneratorExtractor {
     const minLoad = dailyLogs[0]
     const maxLoad = dailyLogs[dailyLogs.length - 1]
 
-    return { minLoad, maxLoad }
+    const generatorLoads = {
+      id: generator.id,
+      branchId: generator.branchId,
+      name: generator.name,
+      brand: generator.brand,
+      model: generator.model,
+      serialNumber: generator.serialNumber,
+      installCapacity: generator.installCapacity,
+      availableCapacity: generator.availableCapacity,
+      minLoad,
+      maxLoad,
+    }
+
+    return generatorLoads;
   }
 
   getGeneratorStatus(generator, dateRange, filter) {
