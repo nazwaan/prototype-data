@@ -61,7 +61,7 @@ function genGenerator(branchId) {
       branchId,
       name: `G${i + 1}`,
       brand: brands[getRandomInt(1, brands.length) - 1],
-      models: `${models[getRandomInt(1, models.length) - 1]}-G${i + 1}`,
+      model: `${models[getRandomInt(1, models.length) - 1]}-G${i + 1}`,
       serialNumber: new Date().valueOf() + (generatorId * 834784) + '',
       installCapacity,
       availableCapacity,

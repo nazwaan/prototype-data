@@ -21,6 +21,18 @@ class BranchExtractor {
 
     return { minLoad, maxLoad }
   }
+
+  getBranchStatus(branch, dateRange, filter) {
+    const generatorExtractor = new GeneratorExtractor();
+    const branchStatusLogs = []
+
+    branch.generators.forEach(generator => {
+      const generatorStatusLogs = generatorExtractor.getGeneratorStatus(generator, dateRange, filter)
+      branchStatusLogs.push(generatorStatusLogs)
+    })
+
+    return branchStatusLogs
+  }
 }
 
 module.exports = BranchExtractor

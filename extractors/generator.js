@@ -4,7 +4,7 @@ class GeneratorExtractor {
   }
 
   getGeneratorLoad(generator, gte, lt) {
-    const dailyLogs = generator.dailyLogs.filter(log => new Date(log.date) >= gte && new Date(log.date) <= lt);
+    const dailyLogs = generator.dailyLogs.filter(log => new Date(log.date) >= gte && new Date(log.date) <= lt)
 
     dailyLogs.sort((a, b) => a.load - b.load)
 
@@ -12,6 +12,30 @@ class GeneratorExtractor {
     const maxLoad = dailyLogs[dailyLogs.length - 1]
 
     return { minLoad, maxLoad }
+  }
+
+  getGeneratorStatus(generator, dateRange, filter) {
+    const { gte, lt } = dateRange
+    const { state, status } = filter
+
+    let statusLogs = generator.statusLogs.filter(log => 
+      new Date(log.date) >= gte && new Date(log.date) <= lt
+    )
+
+    if(state) { statusLogs = statusLogs.filter(log => log.state == state) }
+    if(status) { statusLogs = statusLogs.filter(log => log.status == status) }
+
+    const generatorStatusLogs = {
+      id: generator.id,
+      branchId: generator.branchId,
+      name: generator.name,
+      brand: generator.brand,
+      model: generator.model,
+      serialNumber: generator.serialNumber,
+      statusLogs,
+    }
+
+    return generatorStatusLogs
   }
 }
 
