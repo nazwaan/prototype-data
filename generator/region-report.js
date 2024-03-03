@@ -24,6 +24,45 @@ const generateModels = () => { return [
   `QSL${getRandomInt(1, 9)}`,
 ]}
 
+const generatorShutdownReasons = [
+  {
+    title: 'Generator Overload',
+    description: 'automatic shutdown due to exceeded capacity but with in safe level'
+  },
+  {
+    title: 'Low Oil Pressure',
+    description: 'automatic shutdown due to oil pressure dropping below safe level'
+  },
+  {
+    title: 'Electrical Faults',
+    description: 'automatic shutdown due to short circuits'
+  },
+  {
+    title: 'Generator Overspeed',
+    description: 'automatic shutdown due to exceeded engine speed past safe level'
+  },
+  {
+    title: 'Generator Overspeed',
+    description: 'automatic shutdown due to exceeded engine speed but with in safe level'
+  },
+  {
+    title: 'Cylinder Misfires',
+    description: 'automatic shutdown due to frequent cylinder misfires past safe level'
+  },
+  {
+    title: 'Cylinder Misfires',
+    description: 'automatic shutdown due to cylinder misfires with in safe level'
+  },
+  {
+    title: 'Abnormal Combustion',
+    description: 'automatic shutdown due to frequent abnormal combustion past safe level'
+  },
+  {
+    title: 'Abnormal Combustion',
+    description: 'automatic shutdown due to abnormal combustion with in safe level'
+  },
+]
+
 regions.forEach(region => {
   const regionBranches = [];
 
@@ -129,28 +168,30 @@ function statusDataGenerator(statusData) {
   let { state, status, title, description } = statusData
 
   if(state == 'running' && status == 'healthy') {
+    const generatorShutdownReason = generatorShutdownReasons[getRandomInt(0, generatorShutdownReasons.length - 1)]
+
     state = 'stopped'
     status = 'issues'
-    title = 'generator malfunction'
-    description = 'generator malfunction'
+    title = generatorShutdownReason.title
+    description = generatorShutdownReason.description
   }
-  else if(state == 'stopped' && title != 'stopped for maintenance') {
+  else if(state == 'stopped' && title != 'Stopped For Maintenance' && description.search('with in safe level') != -1) {
     state = 'running'
     status = 'issues'
-    title = 'cracked parts'
-    description = 'cracked parts'
+    title = 'Started With ' + title
+    description = description.replace('automatic shutdown due to', 'running with')
   }
   else if(state == 'running' && status == 'issues') {
     state = 'stopped'
     status = 'issues'
-    title = 'stopped for maintenance'
-    description = 'stopped for maintenance'
+    title = 'Stopped For Maintenance'
+    description = 'manual shutdown to conduct maintenance and diagnostic tests'
   }
   else if(state == 'stopped') {
     state = 'running'
     status = 'healthy'
-    title = 'maintenance service done and healthy'
-    description = 'maintenance service done and healthy'
+    title = 'Conducted Maintenance Service'
+    description = 'conducted maintenance service diagnostic tests. results found healthy'
   }
 
   const newStatusData = {
