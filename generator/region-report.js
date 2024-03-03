@@ -40,7 +40,7 @@ regions.forEach(region => {
   region.branches = regionBranches;
 })
 
-writeFile(regions, './report.json');
+writeFile(regions, './reports/report.json');
 
 // functions
 
@@ -55,13 +55,16 @@ function genGenerator(branchId) {
     const models = generateModels()
     const installCapacity = getRandomInt(2, 9) * 100
     const availableCapacity = installCapacity - (getRandomInt(2, 9) * 10)
+    let model = `${models[getRandomInt(1, models.length) - 1]}`
+
+    if(getRandomInt(1, 10) <= 2) { model += `-G${i + 1}` }
 
     branchGenerators.push({
       id: generatorId,
       branchId,
       name: `G${i + 1}`,
       brand: brands[getRandomInt(1, brands.length) - 1],
-      model: `${models[getRandomInt(1, models.length) - 1]}-G${i + 1}`,
+      model,
       serialNumber: new Date().valueOf() + (generatorId * 834784) + '',
       installCapacity,
       availableCapacity,
@@ -91,6 +94,7 @@ function statusLogGenerator() {
     date: startDate,
     state: 'running',
     status: 'healthy',
+    title: 'routine check and found healthy',
     description: 'routine check and found healthy',
   }
 
@@ -101,7 +105,14 @@ function statusLogGenerator() {
     date < stopDate;
     date = new Date(date.getTime() + (1000 * 60 * 30))
   ) {
-    const makeLogChance = getRandomInt(1, 500);
+    let makeLogChance
+
+    if(statusData.state == 'running' && statusData.status == 'healthy') {
+      makeLogChance = getRandomInt(1, 2000);
+    } else {
+      makeLogChance = getRandomInt(1, 50);
+    }
+
     if(makeLogChance <= 1) {
       statusLogId++
       statusData.date = date
@@ -115,26 +126,30 @@ function statusLogGenerator() {
 }
 
 function statusDataGenerator(statusData) {
-  let { state, status, description } = statusData
+  let { state, status, title, description } = statusData
 
   if(state == 'running' && status == 'healthy') {
     state = 'stopped'
     status = 'issues'
+    title = 'generator malfunction'
     description = 'generator malfunction'
   }
-  else if(state == 'stopped' && description != 'stopped for maintenance') {
+  else if(state == 'stopped' && title != 'stopped for maintenance') {
     state = 'running'
     status = 'issues'
+    title = 'cracked parts'
     description = 'cracked parts'
   }
   else if(state == 'running' && status == 'issues') {
     state = 'stopped'
     status = 'issues'
+    title = 'stopped for maintenance'
     description = 'stopped for maintenance'
   }
   else if(state == 'stopped') {
     state = 'running'
     status = 'healthy'
+    title = 'maintenance service done and healthy'
     description = 'maintenance service done and healthy'
   }
 
@@ -144,6 +159,7 @@ function statusDataGenerator(statusData) {
     date: statusData.date,
     state,
     status,
+    title,
     description,
   }
 

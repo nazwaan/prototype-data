@@ -1,4 +1,4 @@
-const report = require('../report.json')
+const report = require('../reports/report.json')
 const { writeFile } = require('../helpers')
 
 const branchReport = {
@@ -62,10 +62,16 @@ report.forEach(region => {
       branchMod.generators.push(generatorReport)
     })
 
-    branchReport.stoppedWithIssue.push(stoppedIssueBranchMod);
-    branchReport.runningWithIssue.push(runningIssueBranchMod);
+    if(stoppedIssueBranchMod.generators.length) {
+      branchReport.stoppedWithIssue.push(stoppedIssueBranchMod);
+    }
+
+    if(runningIssueBranchMod.generators.length) {
+      branchReport.runningWithIssue.push(runningIssueBranchMod);
+    }
+
     branchReport.branches.push(branchMod);
   })
 })
 
-writeFile(branchReport, './all-generator-status-report.json');
+writeFile(branchReport, './reports/all-generator-status-report.json');

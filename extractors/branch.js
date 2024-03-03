@@ -1,5 +1,5 @@
 const GeneratorExtractor = require('./generator')
-const report = require('../report.json')
+const report = require('../reports/report.json')
 
 class BranchExtractor {
   constructor() {
