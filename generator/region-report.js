@@ -24,6 +24,45 @@ const generateModels = () => { return [
   `QSL${getRandomInt(1, 9)}`,
 ]}
 
+const generatorShutdownReasons = [
+  {
+    title: 'Generator Overload',
+    description: 'automatic shutdown due to exceeded capacity but with in safe level'
+  },
+  {
+    title: 'Low Oil Pressure',
+    description: 'automatic shutdown due to oil pressure dropping below safe level'
+  },
+  {
+    title: 'Electrical Faults',
+    description: 'automatic shutdown due to short circuits'
+  },
+  {
+    title: 'Generator Overspeed',
+    description: 'automatic shutdown due to exceeded engine speed past safe level'
+  },
+  {
+    title: 'Generator Overspeed',
+    description: 'automatic shutdown due to exceeded engine speed but with in safe level'
+  },
+  {
+    title: 'Cylinder Misfires',
+    description: 'automatic shutdown due to frequent cylinder misfires past safe level'
+  },
+  {
+    title: 'Cylinder Misfires',
+    description: 'automatic shutdown due to cylinder misfires with in safe level'
+  },
+  {
+    title: 'Abnormal Combustion',
+    description: 'automatic shutdown due to frequent abnormal combustion past safe level'
+  },
+  {
+    title: 'Abnormal Combustion',
+    description: 'automatic shutdown due to abnormal combustion with in safe level'
+  },
+]
+
 regions.forEach(region => {
   const regionBranches = [];
 
@@ -40,7 +79,7 @@ regions.forEach(region => {
   region.branches = regionBranches;
 })
 
-writeFile(regions);
+writeFile(regions, './reports/report.json');
 
 // functions
 
@@ -50,20 +89,21 @@ function genGenerator(branchId) {
   const maxGenerators = 8
   const generatorAmount = getRandomInt(minGenerators, maxGenerators)
 
-  let branchAvailableCapacity = 0;
-
   for(let i = 0; i < generatorAmount; i++){
     generatorId++;
     const models = generateModels()
     const installCapacity = getRandomInt(2, 9) * 100
     const availableCapacity = installCapacity - (getRandomInt(2, 9) * 10)
+    let model = `${models[getRandomInt(1, models.length) - 1]}`
+
+    if(getRandomInt(1, 10) <= 2) { model += `-G${i + 1}` }
 
     branchGenerators.push({
       id: generatorId,
       branchId,
       name: `G${i + 1}`,
       brand: brands[getRandomInt(1, brands.length) - 1],
-      models: `${models[getRandomInt(1, models.length) - 1]}-G${i + 1}`,
+      model,
       serialNumber: new Date().valueOf() + (generatorId * 834784) + '',
       installCapacity,
       availableCapacity,
@@ -91,8 +131,10 @@ function statusLogGenerator() {
     id: statusLogId,
     generatorId,
     date: startDate,
-    status: 'running',
-    description: 'healthy',
+    state: 'running',
+    status: 'healthy',
+    title: 'routine check and found healthy',
+    description: 'routine check and found healthy',
   }
 
   statusLogs.push(statusData);
@@ -102,7 +144,14 @@ function statusLogGenerator() {
     date < stopDate;
     date = new Date(date.getTime() + (1000 * 60 * 30))
   ) {
-    const makeLogChance = getRandomInt(1, 500);
+    let makeLogChance
+
+    if(statusData.state == 'running' && statusData.status == 'healthy') {
+      makeLogChance = getRandomInt(1, 2000);
+    } else {
+      makeLogChance = getRandomInt(1, 50);
+    }
+
     if(makeLogChance <= 1) {
       statusLogId++
       statusData.date = date
@@ -116,30 +165,42 @@ function statusLogGenerator() {
 }
 
 function statusDataGenerator(statusData) {
-  let { status, description } = statusData
+  let { state, status, title, description } = statusData
 
-  if(status == 'running') {
-    status = 'stopped'
-    description = 'generator malfunction'
+  if(state == 'running' && status == 'healthy') {
+    const generatorShutdownReason = generatorShutdownReasons[getRandomInt(0, generatorShutdownReasons.length - 1)]
+
+    state = 'stopped'
+    status = 'issues'
+    title = generatorShutdownReason.title
+    description = generatorShutdownReason.description
   }
-  else if(status == 'stopped' && description != 'stopped for maintenance') {
-    status = 'running with issues'
-    description = 'cracked parts'
+  else if(state == 'stopped' && title != 'Stopped For Maintenance' && description.search('with in safe level') != -1) {
+    state = 'running'
+    status = 'issues'
+    title = 'Started With ' + title
+    description = description.replace('automatic shutdown due to', 'running with')
   }
-  else if(status == 'running with issues') {
-    status = 'stopped'
-    description = 'stopped for maintenance'
+  else if(state == 'running' && status == 'issues') {
+    state = 'stopped'
+    status = 'issues'
+    title = 'Stopped For Maintenance'
+    description = 'manual shutdown to conduct maintenance and diagnostic tests'
   }
-  else if(status == 'stopped') {
-    status = 'running'
-    description = 'healthy'
+  else if(state == 'stopped') {
+    state = 'running'
+    status = 'healthy'
+    title = 'Conducted Maintenance Service'
+    description = 'conducted maintenance service diagnostic tests. results found healthy'
   }
 
   const newStatusData = {
     id: statusLogId,
     generatorId,
     date: statusData.date,
+    state,
     status,
+    title,
     description,
   }
 

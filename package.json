@@ -6,7 +6,7 @@
   "author": "nazwaan <ismail.nazwan72@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "generate-data": "node ./generator/index.js",
+    "generate-data": "node ./generator/region-report.js && node ./generator/all-generator-status-report.js",
     "dev": "node index.js"
   }
 }
